@@ -1,0 +1,10 @@
+.idea
+
+# Docker related
+.docker/
+docker-compose.override.yml
+*.env
+
+# Docker volumes
+/data/
+/mysql_data/

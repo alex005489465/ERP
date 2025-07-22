@@ -1,0 +1,45 @@
+services:
+  # MySQL Database Service
+  mysql:
+    image: mysql:8.4.5
+    container_name: erp-mysql
+#    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: erp_db
+      MYSQL_USER: erp_user
+      MYSQL_PASSWORD: erp_password
+      TZ: Asia/Taipei
+    ports:
+      - "30306:3306"
+    volumes:
+      - ./MySQL/data:/var/lib/mysql
+    networks:
+      - erp-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # phpMyAdmin Service
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:5.2.2
+    container_name: erp-phpmyadmin
+#    restart: always
+    environment:
+      PMA_HOST: mysql           # MySQL 服務名稱（Docker Compose 服務名）
+      PMA_PORT: 3306            # MySQL 連接埠
+      PMA_USER: root            # 預設登入使用者
+      PMA_PASSWORD: root        # 預設登入密碼
+      PMA_ARBITRARY: 1          # 允許使用者手動輸入其他主機
+    ports:
+      - "30310:80"
+    depends_on:
+      - mysql
+    networks:
+      - erp-network
+
+networks:
+  erp-network:
+    driver: bridge
