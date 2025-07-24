@@ -42,14 +42,14 @@ CREATE PROCEDURE updateDatabase()
             -- 創建新的 key_values 表
             CREATE TABLE key_values
             (
-                `id`          BIGINT AUTO_INCREMENT PRIMARY KEY,
-                `key`         VARCHAR(255) NOT NULL,
-                `value`       TEXT NULL,
-                `description` TEXT NULL,
-                `created_at`  DATETIME(3) DEFAULT CURRENT_TIMESTAMP(3),
-                `updated_at`  DATETIME(3) DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+                `id`          BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '主鍵',
+                `key`         VARCHAR(255) NOT NULL COMMENT '配置名稱',
+                `value`       TEXT NULL COMMENT '值',
+                `description` VARCHAR(255) NULL COMMENT '說明',
+                `created_at`  DATETIME(3) DEFAULT CURRENT_TIMESTAMP(3) COMMENT '創建時間',
+                `updated_at`  DATETIME(3) DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3) COMMENT '更新時間',
                 INDEX         idx_key (`key`)
-            );
+            ) COMMENT = '系統配置參數存儲表';
 
             -- 插入 DBversion 記錄
             INSERT INTO key_values (`key`, `value`, `description`)

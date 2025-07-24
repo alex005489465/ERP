@@ -8,3 +8,6 @@ docker-compose.override.yml
 # Docker volumes
 /data/
 /mysql_data/
+
+# docs
+docs/參考文件
