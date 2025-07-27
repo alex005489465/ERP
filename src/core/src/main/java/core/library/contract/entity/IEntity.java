@@ -22,25 +22,25 @@ public interface IEntity {
     
     /**
      * 獲取建立時間
-     * @return 實體建立時間
+     * @return 實體建立時間 (資料庫儲存精度為 DATETIME(3))
      */
     LocalDateTime getCreatedAt();
     
     /**
      * 設置建立時間
-     * @param createdAt 建立時間
+     * @param createdAt 建立時間 (資料庫儲存精度為 DATETIME(3))
      */
     void setCreatedAt(LocalDateTime createdAt);
     
     /**
      * 獲取更新時間
-     * @return 實體最後更新時間
+     * @return 實體最後更新時間 (資料庫儲存精度為 DATETIME(3))
      */
     LocalDateTime getUpdatedAt();
     
     /**
      * 設置更新時間
-     * @param updatedAt 更新時間
+     * @param updatedAt 更新時間 (資料庫儲存精度為 DATETIME(3))
      */
     void setUpdatedAt(LocalDateTime updatedAt);
 }

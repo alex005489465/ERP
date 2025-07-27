@@ -40,6 +40,20 @@ services:
     networks:
       - erp-network
 
+  # Redis Service
+  redis:
+    image: redis:7.4.5
+    container_name: erp-redis
+    restart: unless-stopped
+    ports:
+      - "30312:6379"
+    volumes:
+      - ./redis/data:/data              # 持久化 RDB 快照與 AOF 日誌存放
+      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf  # 自訂 Redis 設定檔（非必須）
+    command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
+    networks:
+      - erp-network
+
 networks:
   erp-network:
     driver: bridge

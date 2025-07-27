@@ -1,6 +1,7 @@
 package core.library.base;
 
 import core.library.contract.entity.IEntity;
+import jakarta.persistence.Column;
 import java.time.LocalDateTime;
 
 /**
@@ -10,7 +11,11 @@ import java.time.LocalDateTime;
 public abstract class BaseEntity implements IEntity {
     
     protected Long id;
+    
+    @Column(columnDefinition = "DATETIME(3)")
     protected LocalDateTime createdAt;
+    
+    @Column(columnDefinition = "DATETIME(3)")
     protected LocalDateTime updatedAt;
     
     @Override
