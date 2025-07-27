@@ -1,4 +1,4 @@
-package core.library.contract.entity;
+package core.interface.entity;
 
 import java.time.LocalDateTime;
 

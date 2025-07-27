@@ -1,4 +1,4 @@
-package core.library.contract.usecase;
+package core.interface.usecase;
 
 /**
  * 所有應用層 Use Case 的統一執行入口

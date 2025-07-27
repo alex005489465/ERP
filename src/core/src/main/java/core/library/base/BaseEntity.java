@@ -1,6 +1,6 @@
 package core.library.base;
 
-import core.library.contract.entity.IEntity;
+import core.interface.entity.IEntity;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 

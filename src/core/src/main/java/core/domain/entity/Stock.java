@@ -1,4 +1,4 @@
-package core.entity;
+package core.domain.entity;
 
 import core.library.base.BaseEntity;
 import jakarta.persistence.*;

@@ -1,4 +1,4 @@
-package core.library.contract.controller;
+package core.interface.controller;
 
 /**
  * 定義控制器層的回應操作與標準處理方式

@@ -1,9 +1,9 @@
-package core.repository;
+package core.repository.redis;
 
-import core.library.contract.repository.IRedisKeyRepository;
-import core.library.contract.repository.IRedisStringRepository;
-import core.library.contract.repository.IRedisHashRepository;
-import core.library.contract.repository.IRedisListRepository;
+import core.interface.repository.IRedisKeyRepository;
+import core.interface.repository.IRedisStringRepository;
+import core.interface.repository.IRedisHashRepository;
+import core.interface.repository.IRedisListRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;

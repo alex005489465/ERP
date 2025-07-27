@@ -1,4 +1,4 @@
-package core.library.contract.controller;
+package core.interface.controller;
 
 /**
  * 定義 API 回應物件的統一格式

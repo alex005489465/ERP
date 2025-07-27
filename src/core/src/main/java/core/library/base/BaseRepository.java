@@ -1,6 +1,6 @@
 package core.library.base;
 
-import core.library.contract.repository.IBaseRepository;
+import core.interface.repository.IBaseRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.springframework.data.domain.PageRequest;

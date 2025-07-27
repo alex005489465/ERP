@@ -1,7 +1,7 @@
 package core.library.base;
 
-import core.library.contract.controller.IController;
-import core.library.contract.controller.IApiResponse;
+import core.interface.controller.IController;
+import core.interface.controller.IApiResponse;
 
 /**
  * 基礎控制器抽象類別

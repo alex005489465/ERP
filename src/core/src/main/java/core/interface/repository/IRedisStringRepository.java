@@ -1,4 +1,4 @@
-package core.library.contract.repository;
+package core.interface.repository;
 
 /**
  * Redis 字串操作接口

@@ -1,4 +1,4 @@
-package core.library.contract.repository;
+package core.interface.repository;
 
 import java.util.List;
 import java.util.Map;
