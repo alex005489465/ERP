@@ -1,7 +1,9 @@
 package core.library.base;
 
 import core.interface.controller.IController;
-import core.interface.controller.IApiResponse;
+import core.interface.controller.dto.ApiResponse;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 /**
  * 基礎控制器抽象類別
@@ -10,49 +12,38 @@ import core.interface.controller.IApiResponse;
  */
 public abstract class BaseController implements IController {
     
-    /**
-     * 建立 API 回應物件的具體實作
-     * 子類別需要提供具體的 IApiResponse 實作
-     * @param <T> 資料類型
-     * @return IApiResponse 實例
-     */
-    protected abstract <T> IApiResponse<T> createApiResponse();
-    
     @Override
-    public <T> IApiResponse<T> response(T data, String message, int businessCode, int httpStatusCode) {
-        IApiResponse<T> response = createApiResponse();
-        response.setData(data);
-        response.setMessage(message);
-        response.setBusinessCode(businessCode);
-        response.setHttpStatusCode(httpStatusCode);
-        response.setSuccess(httpStatusCode >= 200 && httpStatusCode < 300);
-        return response;
+    public <T> ResponseEntity<ApiResponse<T>> response(ApiResponse<T> apiResponse, int httpStatusCode) {
+        return ResponseEntity.status(httpStatusCode).body(apiResponse);
     }
     
     @Override
-    public <T> IApiResponse<T> success(T data) {
-        IApiResponse<T> response = createApiResponse();
-        response.setData(data);
-        response.setMessage("操作成功");
-        response.setBusinessCode(0);
-        response.setHttpStatusCode(200);
-        response.setSuccess(true);
-        return response;
+    public <T> ResponseEntity<ApiResponse<T>> response(ApiResponse<T> apiResponse) {
+        return ResponseEntity.status(200).body(apiResponse);
     }
     
     @Override
-    public IApiResponse<Object> failure(String message) {
-        return failure(message, -1);
+    public <T> ResponseEntity<ApiResponse<T>> success(T data) {
+        ApiResponse<T> apiResponse = new ApiResponse<>();
+        apiResponse.setData(data);
+        apiResponse.setMessage("操作成功");
+        apiResponse.setBusinessCode(0);
+        apiResponse.setSuccess(true);
+        return ResponseEntity.ok(apiResponse);
     }
     
     @Override
-    public IApiResponse<Object> failure(String message, int businessCode) {
-        IApiResponse<Object> response = createApiResponse();
-        response.setData(null);
-        response.setMessage(message);
-        response.setBusinessCode(businessCode);
-        response.setHttpStatusCode(400);
-        response.setSuccess(false);
-        return response;
+    public ResponseEntity<ApiResponse<Object>> error(String message) {
+        return error(message, -1);
+    }
+    
+    @Override
+    public ResponseEntity<ApiResponse<Object>> error(String message, int businessCode) {
+        ApiResponse<Object> apiResponse = new ApiResponse<>();
+        apiResponse.setData(null);
+        apiResponse.setMessage(message);
+        apiResponse.setBusinessCode(businessCode);
+        apiResponse.setSuccess(false);
+        return ResponseEntity.badRequest().body(apiResponse);
     }
 }

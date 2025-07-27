@@ -16,9 +16,9 @@ import java.time.LocalDateTime;
 })
 public class Stock extends BaseEntity {
     
-    @Column(name = "item_id", columnDefinition = "VARCHAR(255)")
-    private String itemId;
-    
+    @Column(name = "item_id", columnDefinition = "BIGINT")
+    private Long itemId;
+
     @Column(name = "location", length = 50, columnDefinition = "VARCHAR(50)")
     private String location;
     
@@ -30,18 +30,18 @@ public class Stock extends BaseEntity {
     }
     
     // 帶參數建構子
-    public Stock(String itemId, String location, BigDecimal quantity) {
+    public Stock(Long itemId, String location, BigDecimal quantity) {
         this.itemId = itemId;
         this.location = location;
         this.quantity = quantity;
     }
     
     // Getter 和 Setter 方法
-    public String getItemId() {
+    public Long getItemId() {
         return itemId;
     }
     
-    public void setItemId(String itemId) {
+    public void setItemId(Long itemId) {
         this.itemId = itemId;
     }
     
