@@ -54,6 +54,28 @@ services:
     networks:
       - erp-network
 
+  # Core Application Service
+  core:
+    build:
+      context: ..
+      dockerfile: docker/core/Dockerfile
+    container_name: erp-core
+    # restart: unless-stopped
+    ports:
+      - "30308:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/erp_db
+      - SPRING_DATASOURCE_USERNAME=erp_user
+      - SPRING_DATASOURCE_PASSWORD=erp_password
+      - SPRING_REDIS_HOST=redis
+      - SPRING_REDIS_PORT=6379
+    depends_on:
+      - mysql
+      - redis
+    networks:
+      - erp-network
+
 networks:
   erp-network:
     driver: bridge
