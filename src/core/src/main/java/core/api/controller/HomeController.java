@@ -1,6 +1,6 @@
-package core.interface.controller;
+package core.api.controller;
 
-import core.interface.controller.dto.ApiResponse;
+import core.contract.controller.dto.ApiResponse;
 import core.library.base.BaseController;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

@@ -1,4 +1,4 @@
-package core.interface.usecase.dto;
+package core.contract.usecase.dto;
 
 
 /**

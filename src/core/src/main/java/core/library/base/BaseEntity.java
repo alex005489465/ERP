@@ -1,6 +1,6 @@
 package core.library.base;
 
-import core.interface.entity.IEntity;
+import core.contract.entity.IEntity;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
  * 基礎實體抽象類別
  * 統一 ID、時間欄位等標準欄位與行為
  */
+@MappedSuperclass
 public abstract class BaseEntity implements IEntity {
     
     @Id

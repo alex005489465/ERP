@@ -1,6 +1,6 @@
 package core.library.base;
 
-import core.interface.usecase.IUseCase;
+import core.contract.usecase.IUseCase;
 
 /**
  * 基礎用例抽象類別

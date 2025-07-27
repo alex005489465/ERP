@@ -1,8 +1,8 @@
 package core.application.usecase;
 
 import core.application.usecase.CreateStockMovementUseCase;
-import core.interface.usecase.dto.CreateStockMovementInput;
-import core.interface.usecase.dto.CreateStockMovementOutput;
+import core.contract.usecase.dto.CreateStockMovementInput;
+import core.contract.usecase.dto.CreateStockMovementOutput;
 import core.library.base.BaseRepository;
 import core.domain.entity.Stock;
 import core.domain.entity.StockMovement;
@@ -153,7 +153,7 @@ public class CreateStockMovementUseCaseTest {
         );
         
         // Mock repository behavior
-        Stock existingStock = new Stock("1", "A001", new BigDecimal("50.00"));
+        Stock existingStock = new Stock(1L, "A001", new BigDecimal("50.00"));
         when(stockRepository.findFirst(any())).thenReturn(Optional.of(existingStock));
         when(stockRepository.save(any(Stock.class))).thenReturn(existingStock);
         when(stockMovementRepository.save(any(StockMovement.class))).thenReturn(new StockMovement());
@@ -202,7 +202,7 @@ public class CreateStockMovementUseCaseTest {
         );
         
         // Mock repository behavior
-        Stock existingStock = new Stock("1", "A001", new BigDecimal("50.00"));
+        Stock existingStock = new Stock(1L, "A001", new BigDecimal("50.00"));
         when(stockRepository.findFirst(any())).thenReturn(Optional.of(existingStock));
         when(stockRepository.save(any(Stock.class))).thenReturn(existingStock);
         when(stockMovementRepository.save(any(StockMovement.class))).thenReturn(new StockMovement());

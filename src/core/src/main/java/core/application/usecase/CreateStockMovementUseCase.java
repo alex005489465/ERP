@@ -1,8 +1,8 @@
 package core.application.usecase;
 
-import core.interface.usecase.ICreateStockMovementUseCase;
-import core.interface.usecase.dto.CreateStockMovementInput;
-import core.interface.usecase.dto.CreateStockMovementOutput;
+import core.contract.usecase.ICreateStockMovementUseCase;
+import core.contract.usecase.dto.CreateStockMovementInput;
+import core.contract.usecase.dto.CreateStockMovementOutput;
 import core.library.base.BaseUseCase;
 import core.library.base.BaseRepository;
 import core.domain.entity.Stock;

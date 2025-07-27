@@ -1,9 +1,9 @@
-package core.interface.controller;
+package core.api.controller;
 
-import core.interface.controller.dto.ApiResponse;
-import core.interface.usecase.ICreateStockMovementUseCase;
-import core.interface.usecase.dto.CreateStockMovementInput;
-import core.interface.usecase.dto.CreateStockMovementOutput;
+import core.contract.controller.dto.ApiResponse;
+import core.contract.usecase.ICreateStockMovementUseCase;
+import core.contract.usecase.dto.CreateStockMovementInput;
+import core.contract.usecase.dto.CreateStockMovementOutput;
 import core.library.base.BaseController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -43,11 +43,11 @@ public class StockController extends BaseController {
             if (output.isSuccess()) {
                 return success(output);
             } else {
-                return error(output.getMessage());
+                return (ResponseEntity<ApiResponse<CreateStockMovementOutput>>) (ResponseEntity<?>) error(output.getMessage());
             }
         } catch (Exception e) {
             // 處理異常情況
-            return error("庫存異動處理失敗: " + e.getMessage());
+            return (ResponseEntity<ApiResponse<CreateStockMovementOutput>>) (ResponseEntity<?>) error("庫存異動處理失敗: " + e.getMessage());
         }
     }
 }

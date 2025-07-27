@@ -1,7 +1,7 @@
 package core.library.base;
 
-import core.interface.controller.IController;
-import core.interface.controller.dto.ApiResponse;
+import core.contract.controller.IController;
+import core.contract.controller.dto.ApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 

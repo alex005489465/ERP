@@ -1,6 +1,6 @@
-package core.interface.controller;
+package core.contract.controller;
 
-import core.interface.controller.dto.ApiResponse;
+import core.contract.controller.dto.ApiResponse;
 import org.springframework.http.ResponseEntity;
 
 /**

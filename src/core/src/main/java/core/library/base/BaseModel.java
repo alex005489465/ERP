@@ -1,6 +1,6 @@
 package core.library.base;
 
-import core.interface.model.IModel;
+import core.contract.model.IModel;
 
 /**
  * 基礎模型抽象類別

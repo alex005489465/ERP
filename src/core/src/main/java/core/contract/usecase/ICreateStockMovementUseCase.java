@@ -1,7 +1,7 @@
-package core.interface.usecase;
+package core.contract.usecase;
 
-import core.interface.usecase.dto.CreateStockMovementInput;
-import core.interface.usecase.dto.CreateStockMovementOutput;
+import core.contract.usecase.dto.CreateStockMovementInput;
+import core.contract.usecase.dto.CreateStockMovementOutput;
 import java.math.BigDecimal;
 
 /**

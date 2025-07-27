@@ -1,4 +1,4 @@
-package core.interface.model;
+package core.contract.model;
 
 /**
  * 定義純領域模型（非資料庫映射實體）的基本行為

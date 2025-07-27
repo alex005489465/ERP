@@ -1,4 +1,4 @@
-package core.interface.controller.dto;
+package core.contract.controller.dto;
 
 public class ApiResponse<T> {
     
