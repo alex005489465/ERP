@@ -1,0 +1,87 @@
+openapi: 3.1.0
+info:
+  title: OpenAPI definition
+  version: v0
+servers:
+- url: http://localhost:30308
+  description: Generated server url
+paths:
+  /api/stock/movement:
+    post:
+      tags:
+      - stock-controller
+      operationId: movement
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateStockMovementInput"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponseCreateStockMovementOutput"
+  /api/index:
+    get:
+      tags:
+      - home-controller
+      operationId: index
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponseMapStringObject"
+components:
+  schemas:
+    CreateStockMovementInput:
+      type: object
+      properties:
+        itemId:
+          type: integer
+          format: int64
+        location:
+          type: string
+        type:
+          type: integer
+          format: int32
+        quantityChange:
+          type: number
+        note:
+          type: string
+    ApiResponseCreateStockMovementOutput:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        data:
+          $ref: "#/components/schemas/CreateStockMovementOutput"
+        businessCode:
+          type: integer
+          format: int32
+    CreateStockMovementOutput:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+    ApiResponseMapStringObject:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        data:
+          type: object
+          additionalProperties: {}
+        businessCode:
+          type: integer
+          format: int32

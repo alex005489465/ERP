@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "target": "es2021",
+    "module": "commonjs",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "outDir": "dist",                                // 編譯輸出位置
+    "types": ["jest", "node"]                        // ✅ 加入 jest/Node 型別
+  },
+  "include": ["src", "tests"]                        // ✅ 要包含測試目錄
+}
