@@ -1,7 +1,7 @@
 package core.library.base;
 
 import core.library.contract.entity.IEntity;
-import jakarta.persistence.Column;
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 /**
@@ -10,6 +10,8 @@ import java.time.LocalDateTime;
  */
 public abstract class BaseEntity implements IEntity {
     
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     protected Long id;
     
     @Column(columnDefinition = "DATETIME(3)")
