@@ -2,6 +2,7 @@ package erp.core.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
@@ -24,6 +25,7 @@ public class StockMovement {
     /**
      * 庫存異動類型枚舉
      */
+    @Getter
     public enum MovementType {
         INBOUND(1, "入庫"),
         OUTBOUND(2, "出庫");
@@ -35,15 +37,7 @@ public class StockMovement {
             this.code = code;
             this.description = description;
         }
-        
-        public int getCode() {
-            return code;
-        }
-        
-        public String getDescription() {
-            return description;
-        }
-        
+
         /**
          * 根據代碼獲取枚舉值
          */

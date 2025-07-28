@@ -22,6 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ActiveProfiles("test")
 public class RepositoryTest {
 
+    //region 依賴注入
     @Autowired
     private TestEntityManager entityManager;
 
@@ -33,7 +34,9 @@ public class RepositoryTest {
 
     @Autowired
     private StockMovementRepository stockMovementRepository;
+    //endregion
 
+    //region ItemRepository 測試
     @Test
     public void testItemRepository() {
         // 創建測試數據
@@ -62,7 +65,9 @@ public class RepositoryTest {
         List<Item> itemsContaining = itemRepository.findByNameContainingIgnoreCase("測試");
         assertThat(itemsContaining).hasSize(1);
     }
+    //endregion
 
+    //region StockRepository 測試
     @Test
     public void testStockRepository() {
         // 創建測試數據
@@ -96,7 +101,9 @@ public class RepositoryTest {
         BigDecimal totalQuantity = stockRepository.getTotalQuantityByItemId(1L);
         assertThat(totalQuantity).isEqualByComparingTo(new BigDecimal("100.00"));
     }
+    //endregion
 
+    //region StockMovementRepository 測試
     @Test
     public void testStockMovementRepository() {
         // 創建測試數據
@@ -132,7 +139,9 @@ public class RepositoryTest {
         BigDecimal totalInbound = stockMovementRepository.getTotalInboundQuantityByItemId(1L, MovementType.INBOUND);
         assertThat(totalInbound).isEqualByComparingTo(new BigDecimal("50.00"));
     }
+    //endregion
 
+    //region 整合測試
     @Test
     public void testRepositoryIntegration() {
         // 測試所有repository都能正常注入
@@ -149,4 +158,5 @@ public class RepositoryTest {
         assertThat(stockCount).isGreaterThanOrEqualTo(0);
         assertThat(movementCount).isGreaterThanOrEqualTo(0);
     }
+    //endregion
 }
