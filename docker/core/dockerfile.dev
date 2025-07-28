@@ -1,0 +1,26 @@
+# Development Dockerfile for Spring Boot with hot reload
+FROM eclipse-temurin:21-jdk-alpine
+
+WORKDIR /app
+
+# 安裝 Maven
+RUN apk add --no-cache maven
+
+# 複製 Maven 配置文件
+COPY src/core/pom.xml ./
+COPY src/core/.mvn .mvn/
+COPY src/core/mvnw ./
+
+# 下載依賴項
+RUN ./mvnw dependency:go-offline
+
+# 掛載 core 源碼目錄（開發時會從外部掛載）
+VOLUME ["/app/src"]
+
+# 複製 Docker 專用的配置文件（只讀方式）
+COPY docker/core/application-docker.yml /app/application-docker.yml:ro
+
+EXPOSE 8080
+
+# 使用 Spring Boot DevTools 進行熱重載
+CMD ["./mvnw", "spring-boot:run", "-Dspring-boot.run.profiles=docker", "-Dspring-boot.run.jvmArguments=-Dspring.config.location=classpath:/application.yml,file:/app/application-docker.yml"]

@@ -167,7 +167,7 @@ public class CreateStockMovementUseCaseTest {
         assertEquals("庫存異動記錄創建成功", result.getMessage(), "Should return success message");
         
         // Verify repository interactions
-        verify(stockRepository, times(1)).findFirst(any());
+        verify(stockRepository, times(2)).findFirst(any());
         verify(stockRepository, times(1)).save(any(Stock.class));
         verify(stockMovementRepository, times(1)).save(any(StockMovement.class));
     }

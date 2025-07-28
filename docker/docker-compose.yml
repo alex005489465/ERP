@@ -56,13 +56,21 @@ services:
 
   # Core Application Service
   core:
+    # Production build configuration (commented out for development)
+    # build:
+    #   context: ..
+    #   dockerfile: docker/core/Dockerfile
+    
+    # Development build configuration
     build:
       context: ..
-      dockerfile: docker/core/Dockerfile
+      dockerfile: docker/core/dockerfile.dev
     container_name: erp-core
     # restart: unless-stopped
     ports:
       - "30308:8080"
+    volumes:
+      - ../src/core/src:/app/src              # 掛載源碼目錄用於熱重載
     environment:
       - SPRING_PROFILES_ACTIVE=docker
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/erp_db

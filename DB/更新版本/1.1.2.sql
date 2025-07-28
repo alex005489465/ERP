@@ -51,7 +51,7 @@ CREATE PROCEDURE updateDatabase()
                 `item_id`        BIGINT NULL COMMENT '商品ID',
                 `location`       VARCHAR(50) NULL COMMENT '庫存地點名稱（自由文字）',
                 `type`           INT NULL COMMENT '異動類型（數字代碼，如入庫=1，出庫=2）',
-                `quantityChange` DECIMAL(18,6) NULL COMMENT '異動數量',
+                `quantity_change` DECIMAL(18,6) NULL COMMENT '異動數量',
                 `note`           TEXT NULL COMMENT '異動備註',
                 `created_at`     DATETIME(3) NULL COMMENT '異動發生時間（毫秒級）',
                 INDEX            idx_item_location_time (`item_id`, `created_at`),

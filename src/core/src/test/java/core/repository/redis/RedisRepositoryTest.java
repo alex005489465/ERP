@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 @TestPropertySource(properties = {
     "spring.data.redis.host=localhost",
-    "spring.data.redis.port=6379"
+    "spring.data.redis.port=30312"
 })
 class RedisRepositoryTest {
 

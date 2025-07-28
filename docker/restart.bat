@@ -9,7 +9,7 @@ set PROJECT_NAME=erp
 @REM echo.
 @REM echo "🛑 正在停止並移除容器..."
 @REM docker-compose -f %COMPOSE_FILE% -p %PROJECT_NAME% down
-@REM docker-compose -f %COMPOSE_FILE% down
+docker-compose -f %COMPOSE_FILE% down
 
 
 echo.
