@@ -35,6 +35,20 @@ spring:
 server:
   port: 8080
 
+# SpringDoc OpenAPI Configuration
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+    enabled: true
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+    try-it-out-enabled: true
+    operations-sorter: alpha
+    tags-sorter: alpha
+  packages-to-scan: erp.core.controller
+  paths-to-match: /api/**
+
 # Logging Configuration
 logging:
   level:
