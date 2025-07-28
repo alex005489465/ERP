@@ -54,6 +54,7 @@ CREATE PROCEDURE updateDatabase()
                 `quantity_change` DECIMAL(18,6) NULL COMMENT '異動數量',
                 `note`           TEXT NULL COMMENT '異動備註',
                 `created_at`     DATETIME(3) NULL COMMENT '異動發生時間（毫秒級）',
+                `updated_at`     DATETIME(3) NULL COMMENT '更新時間（毫秒級）',
                 INDEX            idx_item_location_time (`item_id`, `created_at`),
                 INDEX            idx_created_at (`created_at`)
             ) COMMENT = '商品庫存異動歷史表';

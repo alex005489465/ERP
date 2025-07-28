@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: core-test
+
+  # Test Database Configuration (MySQL erp_test_db)
+  datasource:
+    url: jdbc:mysql://localhost:30306/erp_test_db?useSSL=false&serverTimezone=Asia/Taipei&allowPublicKeyRetrieval=true
+    username: erp_user
+    password: erp_password
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  # JPA/Hibernate Configuration for Testing
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
+
+# Logging Configuration for Tests
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    erp.core: DEBUG
