@@ -2,6 +2,12 @@ package erp.core.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import erp.core.entity.Item;
+import erp.core.entity.Stock;
+import erp.core.entity.StockMovement;
+import erp.core.entity.StorageLocation;
+import erp.core.repository.StockRepository;
+import erp.core.repository.StockMovementRepository;
+import erp.core.repository.StorageLocationRepository;
 import erp.core.service.WarehouseManagementService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,13 +43,71 @@ public class ApiIntegrationTest {
     @Autowired
     private WarehouseManagementService warehouseService;
     
+    @Autowired
+    private StockRepository stockRepository;
+    
+    @Autowired
+    private StockMovementRepository stockMovementRepository;
+    
+    @Autowired
+    private StorageLocationRepository storageLocationRepository;
+    
     private MockMvc mockMvc;
     private ObjectMapper objectMapper;
+    
+    // 測試用的儲位ID
+    private Long testStorageLocationId;
     
     @BeforeEach
     void setUp() {
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
         objectMapper = new ObjectMapper();
+        
+        // 創建測試用的儲位 A001
+        StorageLocation testLocation = new StorageLocation();
+        testLocation.setWarehouseId(1L);
+        testLocation.setCode("A001");
+        testLocation.setZone("A區");
+        testLocation.setCapacity(1000);
+        testLocation.setUnit("個");
+        testLocation.setStatus((byte) 1); // 啟用狀態
+        testStorageLocationId = storageLocationRepository.save(testLocation).getId();
+        
+        // 創建第二個測試用的儲位 B002 (用於轉庫測試)
+        StorageLocation testLocation2 = new StorageLocation();
+        testLocation2.setWarehouseId(1L);
+        testLocation2.setCode("B002");
+        testLocation2.setZone("B區");
+        testLocation2.setCapacity(1000);
+        testLocation2.setUnit("個");
+        testLocation2.setStatus((byte) 1); // 啟用狀態
+        storageLocationRepository.save(testLocation2);
+    }
+    
+    /**
+     * 直接創建庫存記錄的輔助方法
+     */
+    private void createStockDirectly(Long itemId, Long storageLocationId, BigDecimal quantity) {
+        Stock stock = new Stock();
+        stock.setItemId(itemId);
+        stock.setWarehouseId(1L);
+        stock.setStorageLocationId(storageLocationId);
+        stock.setQuantity(quantity);
+        stockRepository.save(stock);
+    }
+    
+    /**
+     * 直接創建庫存異動記錄的輔助方法
+     */
+    private void createMovementDirectly(Long itemId, Long storageLocationId, StockMovement.MovementType type, BigDecimal quantity, String note) {
+        StockMovement movement = new StockMovement();
+        movement.setItemId(itemId);
+        movement.setWarehouseId(1L);
+        movement.setStorageLocationId(storageLocationId);
+        movement.setType(type);
+        movement.setQuantityChange(quantity);
+        movement.setNote(note);
+        stockMovementRepository.save(movement);
     }
     
     // ========== 商品管理API測試 ==========
@@ -156,7 +220,7 @@ public class ApiIntegrationTest {
     void testStockGetTotalStock() throws Exception {
         // 先創建商品和庫存
         Item item = warehouseService.createItem("測試商品", "個");
-        warehouseService.inbound(item.getId(), "A001", new BigDecimal("100"), "測試入庫");
+        createStockDirectly(item.getId(), testStorageLocationId, new BigDecimal("100"));
         
         Map<String, Object> data = new HashMap<>();
         data.put("itemId", item.getId());
@@ -202,7 +266,7 @@ public class ApiIntegrationTest {
     void testOperationOutbound() throws Exception {
         // 先創建商品和庫存
         Item item = warehouseService.createItem("測試商品", "個");
-        warehouseService.inbound(item.getId(), "A001", new BigDecimal("100"), "測試入庫");
+        createStockDirectly(item.getId(), testStorageLocationId, new BigDecimal("100"));
         
         Map<String, Object> data = new HashMap<>();
         data.put("itemId", item.getId());
@@ -228,7 +292,7 @@ public class ApiIntegrationTest {
     void testOperationTransfer() throws Exception {
         // 先創建商品和庫存
         Item item = warehouseService.createItem("測試商品", "個");
-        warehouseService.inbound(item.getId(), "A001", new BigDecimal("100"), "測試入庫");
+        createStockDirectly(item.getId(), testStorageLocationId, new BigDecimal("100"));
         
         Map<String, Object> data = new HashMap<>();
         data.put("itemId", item.getId());
@@ -288,7 +352,8 @@ public class ApiIntegrationTest {
     void testMovementGetByItem() throws Exception {
         // 先創建商品和進行操作
         Item item = warehouseService.createItem("測試商品", "個");
-        warehouseService.inbound(item.getId(), "A001", new BigDecimal("100"), "測試入庫");
+        createStockDirectly(item.getId(), testStorageLocationId, new BigDecimal("100"));
+        createMovementDirectly(item.getId(), testStorageLocationId, StockMovement.MovementType.INBOUND, new BigDecimal("100"), "測試入庫");
         
         Map<String, Object> data = new HashMap<>();
         data.put("itemId", item.getId());

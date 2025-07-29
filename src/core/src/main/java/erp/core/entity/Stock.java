@@ -14,7 +14,8 @@ import java.time.LocalDateTime;
 @Table(name = "stocks",
        indexes = {
            @Index(name = "idx_item_id", columnList = "item_id"),
-           @Index(name = "idx_location", columnList = "location")
+           @Index(name = "idx_warehouse_id", columnList = "warehouse_id"),
+           @Index(name = "idx_storage_location_id", columnList = "storage_location_id")
        })
 @Data
 @NoArgsConstructor
@@ -28,8 +29,11 @@ public class Stock {
     @Column(name = "item_id", nullable = true)
     private Long itemId;
     
-    @Column(length = 50, nullable = true)
-    private String location;
+    @Column(name = "warehouse_id", nullable = true, columnDefinition = "BIGINT NULL COMMENT '倉庫ID'")
+    private Long warehouseId;
+    
+    @Column(name = "storage_location_id", nullable = true, columnDefinition = "BIGINT NULL COMMENT '儲位ID'")
+    private Long storageLocationId;
     
     @Column(precision = 18, scale = 6, nullable = true)
     private BigDecimal quantity;

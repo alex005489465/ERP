@@ -4,9 +4,11 @@ import erp.core.entity.Item;
 import erp.core.entity.Stock;
 import erp.core.entity.StockMovement;
 import erp.core.entity.StockMovement.MovementType;
+import erp.core.entity.StorageLocation;
 import erp.core.repository.ItemRepository;
 import erp.core.repository.StockRepository;
 import erp.core.repository.StockMovementRepository;
+import erp.core.repository.StorageLocationRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -56,6 +58,7 @@ public class WarehouseManagementService {
     private final ItemRepository itemRepository;
     private final StockRepository stockRepository;
     private final StockMovementRepository stockMovementRepository;
+    private final StorageLocationRepository storageLocationRepository;
     //endregion
     
     //region 商品管理 (CRUD)
@@ -152,14 +155,16 @@ public class WarehouseManagementService {
      * 查詢指定位置的所有庫存
      */
     public List<Stock> getStocksByLocation(String location) {
-        return stockRepository.findByLocation(location);
+        StorageLocation storageLocation = getStorageLocationByCode(location);
+        return stockRepository.findByStorageLocationId(storageLocation.getId());
     }
     
     /**
      * 查詢指定商品在指定位置的庫存
      */
     public Optional<Stock> getStock(Long itemId, String location) {
-        return stockRepository.findByItemIdAndLocation(itemId, location);
+        StorageLocation storageLocation = getStorageLocationByCode(location);
+        return stockRepository.findByItemIdAndStorageLocationId(itemId, storageLocation.getId());
     }
     
     /**
@@ -229,7 +234,7 @@ public class WarehouseManagementService {
         validateItemExists(itemId);
         
         // 檢查庫存是否足夠
-        Optional<Stock> stockOpt = stockRepository.findByItemIdAndLocation(itemId, location);
+        Optional<Stock> stockOpt = getStock(itemId, location);
         if (stockOpt.isEmpty() || stockOpt.get().getQuantity().compareTo(quantity) < 0) {
             throw new IllegalStateException("庫存不足，無法出庫");
         }
@@ -261,7 +266,7 @@ public class WarehouseManagementService {
         validateItemExists(itemId);
         
         // 檢查來源庫存是否足夠
-        Optional<Stock> fromStockOpt = stockRepository.findByItemIdAndLocation(itemId, fromLocation);
+        Optional<Stock> fromStockOpt = getStock(itemId, fromLocation);
         if (fromStockOpt.isEmpty() || fromStockOpt.get().getQuantity().compareTo(quantity) < 0) {
             throw new IllegalStateException("來源位置庫存不足，無法轉庫");
         }
@@ -291,7 +296,7 @@ public class WarehouseManagementService {
         validateItemExists(itemId);
         
         // 檢查來源庫存是否足夠
-        Optional<Stock> fromStockOpt = stockRepository.findByItemIdAndLocation(itemId, fromLocation);
+        Optional<Stock> fromStockOpt = getStock(itemId, fromLocation);
         if (fromStockOpt.isEmpty() || fromStockOpt.get().getQuantity().compareTo(quantity) < 0) {
             throw new IllegalStateException("來源位置庫存不足，無法凍結");
         }
@@ -321,7 +326,7 @@ public class WarehouseManagementService {
         validateItemExists(itemId);
         
         // 檢查來源庫存是否足夠
-        Optional<Stock> fromStockOpt = stockRepository.findByItemIdAndLocation(itemId, fromLocation);
+        Optional<Stock> fromStockOpt = getStock(itemId, fromLocation);
         if (fromStockOpt.isEmpty() || fromStockOpt.get().getQuantity().compareTo(quantity) < 0) {
             throw new IllegalStateException("來源位置庫存不足，無法報廢");
         }
@@ -351,7 +356,7 @@ public class WarehouseManagementService {
         validateItemExists(itemId);
         
         // 檢查凍結倉庫存是否足夠
-        Optional<Stock> freezeStockOpt = stockRepository.findByItemIdAndLocation(itemId, FREEZE_WAREHOUSE);
+        Optional<Stock> freezeStockOpt = getStock(itemId, FREEZE_WAREHOUSE);
         if (freezeStockOpt.isEmpty() || freezeStockOpt.get().getQuantity().compareTo(quantity) < 0) {
             throw new IllegalStateException("凍結倉庫存不足，無法解凍");
         }
@@ -374,8 +379,13 @@ public class WarehouseManagementService {
     private void performStockOperation(Long itemId, String location, MovementType movementType, 
                                      BigDecimal quantity, String note) {
         
+        // 獲取儲位信息
+        StorageLocation storageLocation = getStorageLocationByCode(location);
+        Long warehouseId = storageLocation.getWarehouseId();
+        Long storageLocationId = storageLocation.getId();
+        
         // 1. 查詢現有庫存
-        Optional<Stock> stockOpt = stockRepository.findByItemIdAndLocation(itemId, location);
+        Optional<Stock> stockOpt = stockRepository.findByItemIdAndStorageLocationId(itemId, storageLocationId);
         Stock stock;
         
         if (stockOpt.isPresent()) {
@@ -384,7 +394,8 @@ public class WarehouseManagementService {
             // 如果庫存記錄不存在，創建新記錄
             stock = new Stock();
             stock.setItemId(itemId);
-            stock.setLocation(location);
+            stock.setWarehouseId(warehouseId);
+            stock.setStorageLocationId(storageLocationId);
             stock.setQuantity(BigDecimal.ZERO);
         }
         
@@ -405,7 +416,8 @@ public class WarehouseManagementService {
         // 3. 寫入庫存異動記錄
         StockMovement movement = new StockMovement();
         movement.setItemId(itemId);
-        movement.setLocation(location);
+        movement.setWarehouseId(warehouseId);
+        movement.setStorageLocationId(storageLocationId);
         movement.setType(movementType);
         movement.setQuantityChange(quantity);
         movement.setNote(note);
@@ -424,6 +436,16 @@ public class WarehouseManagementService {
             throw new IllegalArgumentException("商品不存在: " + itemId);
         }
     }
+    
+    /**
+     * 根據位置編號獲取儲位信息
+     * @param locationCode 位置編號 (如 "A001")
+     * @return StorageLocation 儲位信息
+     */
+    private StorageLocation getStorageLocationByCode(String locationCode) {
+        return storageLocationRepository.findByCode(locationCode)
+            .orElseThrow(() -> new IllegalArgumentException("儲位不存在: " + locationCode));
+    }
     //endregion
     
     //region 庫存異動記錄查詢
@@ -438,7 +460,8 @@ public class WarehouseManagementService {
      * 查詢指定位置的庫存異動記錄
      */
     public List<StockMovement> getStockMovementsByLocation(String location) {
-        return stockMovementRepository.findByLocation(location);
+        StorageLocation storageLocation = getStorageLocationByCode(location);
+        return stockMovementRepository.findByStorageLocationId(storageLocation.getId());
     }
     
     /**

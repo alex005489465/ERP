@@ -4,9 +4,11 @@ import erp.core.entity.Item;
 import erp.core.entity.Stock;
 import erp.core.entity.StockMovement;
 import erp.core.entity.StockMovement.MovementType;
+import erp.core.entity.StorageLocation;
 import erp.core.repository.ItemRepository;
 import erp.core.repository.StockRepository;
 import erp.core.repository.StockMovementRepository;
+import erp.core.repository.StorageLocationRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +40,9 @@ class WarehouseManagementServiceTest {
     @Autowired
     private StockMovementRepository stockMovementRepository;
     
+    @Autowired
+    private StorageLocationRepository storageLocationRepository;
+    
     private Item testItem;
     private final String TEST_LOCATION_A = "WH_A";
     private final String TEST_LOCATION_B = "WH_B";
@@ -50,11 +55,33 @@ class WarehouseManagementServiceTest {
         stockMovementRepository.deleteAll();
         stockRepository.deleteAll();
         itemRepository.deleteAll();
+        storageLocationRepository.deleteAll();
+        
+        // 創建測試用的儲位
+        createStorageLocation(TEST_LOCATION_A, "測試倉庫A", "A區");
+        createStorageLocation(TEST_LOCATION_B, "測試倉庫B", "B區");
+        createStorageLocation(WarehouseManagementService.FREEZE_WAREHOUSE, "凍結倉", "凍結區");
+        createStorageLocation(WarehouseManagementService.SCRAP_WAREHOUSE, "報廢倉", "報廢區");
         
         // 創建測試商品
         testItem = warehouseService.createItem("測試商品", "個");
         
         System.out.println("[DEBUG_LOG] 測試設置完成，創建商品ID: " + testItem.getId());
+    }
+    
+    /**
+     * 創建儲位的輔助方法
+     */
+    private void createStorageLocation(String code, String description, String zone) {
+        StorageLocation location = new StorageLocation();
+        location.setWarehouseId(1L);
+        location.setCode(code);
+        location.setZone(zone);
+        location.setCapacity(10000);
+        location.setUnit("個");
+        location.setStatus((byte) 1); // 啟用狀態
+        storageLocationRepository.save(location);
+        System.out.println("[DEBUG_LOG] 創建儲位: " + code + " (" + description + ")");
     }
     //endregion
     
