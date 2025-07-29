@@ -30,8 +30,8 @@ CREATE PROCEDURE updateDatabase()
                 `status`     TINYINT NULL COMMENT '狀態：0=停用, 1=啟用, 2=停職',
                 `created_at` DATETIME(3) NULL COMMENT '建立時間（毫秒級）',
                 `updated_at` DATETIME(3) NULL COMMENT '更新時間（毫秒級）',
-                INDEX        idx_status (`status`),
-                INDEX        idx_role (`role`)
+                INDEX        idx_users_status (`status`),
+                INDEX        idx_users_role (`role`)
             ) COMMENT = '人員表';
 
             -- 創建 warehouses 表 - 倉庫表
@@ -45,8 +45,8 @@ CREATE PROCEDURE updateDatabase()
                 `status`     TINYINT NULL COMMENT '狀態：0=停用, 1=啟用',
                 `created_at` DATETIME(3) NULL COMMENT '建立時間（毫秒級）',
                 `updated_at` DATETIME(3) NULL COMMENT '更新時間（毫秒級）',
-                INDEX        idx_status (`status`),
-                INDEX        idx_type (`type`)
+                INDEX        idx_warehouses_status (`status`),
+                INDEX        idx_warehouses_type (`type`)
             ) COMMENT = '倉庫表';
 
             -- 創建 storage_locations 表 - 儲位表
@@ -63,9 +63,9 @@ CREATE PROCEDURE updateDatabase()
                 `status`       TINYINT NULL COMMENT '狀態：0=停用, 1=啟用, 2=維護中',
                 `created_at`   DATETIME(3) NULL COMMENT '建立時間（毫秒級）',
                 `updated_at`   DATETIME(3) NULL COMMENT '更新時間（毫秒級）',
-                INDEX          idx_warehouse_id (`warehouse_id`),
-                INDEX          idx_code (`code`),
-                INDEX          idx_status (`status`)
+                INDEX          idx_storage_locations_warehouse_id (`warehouse_id`),
+                INDEX          idx_storage_locations_code (`code`),
+                INDEX          idx_storage_locations_status (`status`)
             ) COMMENT = '儲位表';
 
             -- 創建 slips 表 - 單據表
@@ -77,10 +77,10 @@ CREATE PROCEDURE updateDatabase()
                 `status`     TINYINT NULL COMMENT '狀態：0=草稿, 1=完成, 2=取消',
                 `created_at` DATETIME(3) NULL COMMENT '建立時間（毫秒級）',
                 `updated_at` DATETIME(3) NULL COMMENT '更新時間（毫秒級）',
-                INDEX        idx_slips_type (`slips_type`),
-                INDEX        idx_created_by (`created_by`),
-                INDEX        idx_status (`status`),
-                INDEX        idx_created_at (`created_at`)
+                INDEX        idx_slips_slips_type (`slips_type`),
+                INDEX        idx_slips_created_by (`created_by`),
+                INDEX        idx_slips_status (`status`),
+                INDEX        idx_slips_created_at (`created_at`)
             ) COMMENT = '單據表';
 
             -- 修改 stocks 表 - 商品庫存狀態表
@@ -95,8 +95,8 @@ CREATE PROCEDURE updateDatabase()
 
             -- 添加新索引
             ALTER TABLE stocks 
-            ADD INDEX idx_warehouse_id (`warehouse_id`),
-            ADD INDEX idx_storage_location_id (`storage_location_id`);
+            ADD INDEX idx_stocks_warehouse_id (`warehouse_id`),
+            ADD INDEX idx_stocks_storage_location_id (`storage_location_id`);
 
             -- 修改 stock_movements 表 - 商品庫存異動歷史表
             -- 添加新欄位
@@ -111,9 +111,9 @@ CREATE PROCEDURE updateDatabase()
 
             -- 添加新索引
             ALTER TABLE stock_movements 
-            ADD INDEX idx_warehouse_id (`warehouse_id`),
-            ADD INDEX idx_storage_location_id (`storage_location_id`),
-            ADD INDEX idx_slip_id (`slip_id`);
+            ADD INDEX idx_stock_movements_warehouse_id (`warehouse_id`),
+            ADD INDEX idx_stock_movements_storage_location_id (`storage_location_id`),
+            ADD INDEX idx_stock_movements_slip_id (`slip_id`);
 
             -- 更新 DBversion 記錄
             UPDATE key_values

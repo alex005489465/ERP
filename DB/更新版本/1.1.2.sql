@@ -40,8 +40,8 @@ CREATE PROCEDURE updateDatabase()
                 `quantity`   DECIMAL(18,6) NULL COMMENT '現有庫存量',
                 `created_at` DATETIME(3) NULL COMMENT '建立時間（毫秒級）',
                 `updated_at` DATETIME(3) NULL COMMENT '更新時間（毫秒級）',
-                INDEX        idx_item_id (`item_id`),
-                INDEX        idx_location (`location`)
+                INDEX        idx_stocks_item_id (`item_id`),
+                INDEX        idx_stocks_location (`location`)
             ) COMMENT = '商品庫存狀態表';
 
             -- 創建 stock_movements 表 - 商品庫存異動歷史表
@@ -55,8 +55,8 @@ CREATE PROCEDURE updateDatabase()
                 `note`           TEXT NULL COMMENT '異動備註',
                 `created_at`     DATETIME(3) NULL COMMENT '異動發生時間（毫秒級）',
                 `updated_at`     DATETIME(3) NULL COMMENT '更新時間（毫秒級）',
-                INDEX            idx_item_location_time (`item_id`, `created_at`),
-                INDEX            idx_created_at (`created_at`)
+                INDEX            idx_stock_movements_item_created (`item_id`, `created_at`),
+                INDEX            idx_stock_movements_created_at (`created_at`)
             ) COMMENT = '商品庫存異動歷史表';
 
             -- 更新 DBversion 記錄

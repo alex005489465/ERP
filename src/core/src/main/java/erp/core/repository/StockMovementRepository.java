@@ -29,10 +29,6 @@ public interface StockMovementRepository extends JpaRepository<StockMovement, Lo
      */
     List<StockMovement> findByStorageLocationId(Long storageLocationId);
     
-    /**
-     * 根據單據ID查找庫存異動記錄
-     */
-    List<StockMovement> findBySlipId(Long slipId);
     
     /**
      * 根據異動類型查找記錄 (INBOUND=入庫, OUTBOUND=出庫)

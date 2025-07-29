@@ -9,6 +9,7 @@ import erp.core.repository.ItemRepository;
 import erp.core.repository.StockRepository;
 import erp.core.repository.StockMovementRepository;
 import erp.core.repository.StorageLocationRepository;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -35,6 +36,7 @@ public class WarehouseManagementService {
     /**
      * 庫存操作類型枚舉
      */
+    @Getter
     public enum OperationType {
         INBOUND("入庫"),
         OUTBOUND("出庫"),
@@ -47,10 +49,7 @@ public class WarehouseManagementService {
         OperationType(String description) {
             this.description = description;
         }
-        
-        public String getDescription() {
-            return description;
-        }
+
     }
     //endregion
     

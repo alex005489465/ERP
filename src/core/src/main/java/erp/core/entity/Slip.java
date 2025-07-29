@@ -8,14 +8,15 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "slips",
        indexes = {
-           @Index(name = "idx_slips_type", columnList = "slips_type"),
-           @Index(name = "idx_created_by", columnList = "created_by"),
-           @Index(name = "idx_status", columnList = "status"),
-           @Index(name = "idx_created_at", columnList = "created_at")
+           @Index(name = "idx_slips_slips_type", columnList = "slips_type"),
+           @Index(name = "idx_slips_created_by", columnList = "created_by"),
+           @Index(name = "idx_slips_status", columnList = "status"),
+           @Index(name = "idx_slips_created_at", columnList = "created_at")
        })
 @Data
 @NoArgsConstructor
@@ -43,4 +44,13 @@ public class Slip {
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = true, columnDefinition = "DATETIME(3) NULL COMMENT '更新時間（毫秒級）'")
     private LocalDateTime updatedAt;
+    
+    // Many-to-many relationship with StockMovement through SlipMovement join table
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "slip_movements",
+        joinColumns = @JoinColumn(name = "slip_id"),
+        inverseJoinColumns = @JoinColumn(name = "stock_movement_id")
+    )
+    private List<StockMovement> stockMovements;
 }

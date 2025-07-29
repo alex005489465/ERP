@@ -35,21 +35,15 @@ public class OperationController {
             if (action == null) {
                 return ApiResponse.error("操作類型不能為空", ErrorCode.INVALID_ARGUMENT);
             }
-            
-            switch (action) {
-                case "inbound":
-                    return handleInbound(data);
-                case "outbound":
-                    return handleOutbound(data);
-                case "freeze":
-                    return handleFreeze(data);
-                case "scrap":
-                    return handleScrap(data);
-                case "unfreeze":
-                    return handleUnfreeze(data);
-                default:
-                    return ApiResponse.error("不支援的操作類型: " + action, ErrorCode.UNSUPPORTED_ACTION);
-            }
+
+            return switch (action) {
+                case "inbound" -> handleInbound(data);
+                case "outbound" -> handleOutbound(data);
+                case "freeze" -> handleFreeze(data);
+                case "scrap" -> handleScrap(data);
+                case "unfreeze" -> handleUnfreeze(data);
+                default -> ApiResponse.error("不支援的操作類型: " + action, ErrorCode.UNSUPPORTED_ACTION);
+            };
         } catch (IllegalArgumentException e) {
             log.warn("參數錯誤: {}", e.getMessage());
             if (e.getMessage().contains("商品不存在")) {
