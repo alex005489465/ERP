@@ -1,7 +1,6 @@
 package erp.core.controller;
 
 import erp.core.constant.ErrorCode;
-import erp.core.dto.ApiRequest;
 import erp.core.dto.ApiResponse;
 import erp.core.service.WarehouseManagementService;
 import lombok.RequiredArgsConstructor;
@@ -23,11 +22,15 @@ public class OperationController {
     
     private final WarehouseManagementService warehouseService;
     
-    @PostMapping
-    public ApiResponse<Void> handleOperation(@RequestBody ApiRequest request) {
+    /**
+     * 一般庫存操作 (入庫、出庫、凍結、報廢、解凍)
+     */
+    @PostMapping("/operation")
+    public ApiResponse<Void> handleGeneralOperation(@RequestBody Map<String, Object> request) {
         try {
-            String action = request.getAction();
-            Map<String, Object> data = request.getData();
+            String action = (String) request.get("action");
+            @SuppressWarnings("unchecked")
+            Map<String, Object> data = (Map<String, Object>) request.get("data");
             
             if (action == null) {
                 return ApiResponse.error("操作類型不能為空", ErrorCode.INVALID_ARGUMENT);
@@ -38,8 +41,6 @@ public class OperationController {
                     return handleInbound(data);
                 case "outbound":
                     return handleOutbound(data);
-                case "transfer":
-                    return handleTransfer(data);
                 case "freeze":
                     return handleFreeze(data);
                 case "scrap":
@@ -63,6 +64,31 @@ public class OperationController {
             return ApiResponse.error(e.getMessage(), ErrorCode.INTERNAL_ERROR);
         } catch (Exception e) {
             log.error("處理庫存操作時發生未預期錯誤", e);
+            return ApiResponse.error("系統內部錯誤", ErrorCode.UNEXPECTED_ERROR);
+        }
+    }
+
+    /**
+     * 轉庫操作 (需要來源位置和目標位置)
+     */
+    @PostMapping("/transfer")
+    public ApiResponse<Void> handleTransferOperation(@RequestBody Map<String, Object> data) {
+        try {
+            return handleTransfer(data);
+        } catch (IllegalArgumentException e) {
+            log.warn("參數錯誤: {}", e.getMessage());
+            if (e.getMessage().contains("商品不存在")) {
+                return ApiResponse.error(e.getMessage(), ErrorCode.ITEM_NOT_FOUND);
+            }
+            return ApiResponse.error(e.getMessage(), ErrorCode.INVALID_ARGUMENT);
+        } catch (IllegalStateException e) {
+            log.warn("狀態錯誤: {}", e.getMessage());
+            if (e.getMessage().contains("庫存不足")) {
+                return ApiResponse.error(e.getMessage(), ErrorCode.INSUFFICIENT_STOCK);
+            }
+            return ApiResponse.error(e.getMessage(), ErrorCode.INTERNAL_ERROR);
+        } catch (Exception e) {
+            log.error("處理轉庫操作時發生未預期錯誤", e);
             return ApiResponse.error("系統內部錯誤", ErrorCode.UNEXPECTED_ERROR);
         }
     }

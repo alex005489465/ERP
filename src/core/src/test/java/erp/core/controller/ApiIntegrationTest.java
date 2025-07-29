@@ -1,7 +1,6 @@
 package erp.core.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import erp.core.dto.ApiRequest;
 import erp.core.entity.Item;
 import erp.core.service.WarehouseManagementService;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,7 +18,7 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.hamcrest.Matchers.containsString;
 
@@ -55,11 +54,9 @@ public class ApiIntegrationTest {
         data.put("name", "測試商品");
         data.put("unit", "個");
         
-        ApiRequest request = new ApiRequest("create", data);
-        
-        mockMvc.perform(post("/api/warehouse/item")
+        mockMvc.perform(post("/api/warehouse/item/create")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
+                .content(objectMapper.writeValueAsString(data)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.message").value("商品創建成功"))
@@ -73,11 +70,9 @@ public class ApiIntegrationTest {
         Map<String, Object> data = new HashMap<>();
         data.put("unit", "個");
         
-        ApiRequest request = new ApiRequest("create", data);
-        
-        mockMvc.perform(post("/api/warehouse/item")
+        mockMvc.perform(post("/api/warehouse/item/create")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
+                .content(objectMapper.writeValueAsString(data)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(false))
                 .andExpect(jsonPath("$.message").value("商品名稱不能為空"))
@@ -90,11 +85,9 @@ public class ApiIntegrationTest {
         warehouseService.createItem("測試商品1", "個");
         warehouseService.createItem("測試商品2", "台");
         
-        ApiRequest request = new ApiRequest("getAll", null);
-        
-        mockMvc.perform(post("/api/warehouse/item")
+        mockMvc.perform(post("/api/warehouse/item/info")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
+                .content("{}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.message").value("查詢成功"))
@@ -110,11 +103,9 @@ public class ApiIntegrationTest {
         Map<String, Object> data = new HashMap<>();
         data.put("name", "iPhone");
         
-        ApiRequest request = new ApiRequest("search", data);
-        
-        mockMvc.perform(post("/api/warehouse/item")
+        mockMvc.perform(post("/api/warehouse/item/info")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
+                .content(objectMapper.writeValueAsString(data)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.message").value("搜尋成功"))
@@ -124,29 +115,24 @@ public class ApiIntegrationTest {
     
     @Test
     void testUnsupportedAction() throws Exception {
-        ApiRequest request = new ApiRequest("invalidAction", null);
-        
-        mockMvc.perform(post("/api/warehouse/item")
+        // This test is no longer relevant since we don't have action-based endpoints
+        // Instead, test accessing a non-existent endpoint
+        mockMvc.perform(post("/api/warehouse/item/invalidAction")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.success").value(false))
-                .andExpect(jsonPath("$.message").value("不支援的操作類型: invalidAction"))
-                .andExpect(jsonPath("$.errorCode").value("UNSUPPORTED_ACTION"));
+                .content("{}"))
+                .andExpect(status().is5xxServerError());
     }
     
     // ========== 庫存查詢API測試 ==========
     
     @Test
     void testStockGetZeroStocks() throws Exception {
-        ApiRequest request = new ApiRequest("getZeroStocks", null);
-        
-        mockMvc.perform(post("/api/warehouse/stock")
+        mockMvc.perform(post("/api/warehouse/stock/lowAndZeroStocks")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
+                .content("{}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.message").value("查詢成功"))
+                .andExpect(jsonPath("$.message").value("查詢零庫存成功"))
                 .andExpect(jsonPath("$.data").isArray())
                 .andExpect(jsonPath("$.errorCode").isEmpty());
     }
@@ -154,16 +140,14 @@ public class ApiIntegrationTest {
     @Test
     void testStockGetLowStocks() throws Exception {
         Map<String, Object> data = new HashMap<>();
-        data.put("threshold", 10);
+        data.put("threshold", "10");
         
-        ApiRequest request = new ApiRequest("getLowStocks", data);
-        
-        mockMvc.perform(post("/api/warehouse/stock")
+        mockMvc.perform(post("/api/warehouse/stock/lowAndZeroStocks")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
+                .content(objectMapper.writeValueAsString(data)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.message").value("查詢成功"))
+                .andExpect(jsonPath("$.message").value("查詢低庫存成功"))
                 .andExpect(jsonPath("$.data").isArray())
                 .andExpect(jsonPath("$.errorCode").isEmpty());
     }
@@ -177,11 +161,9 @@ public class ApiIntegrationTest {
         Map<String, Object> data = new HashMap<>();
         data.put("itemId", item.getId());
         
-        ApiRequest request = new ApiRequest("getTotalStock", data);
-        
-        mockMvc.perform(post("/api/warehouse/stock")
+        mockMvc.perform(post("/api/warehouse/stock/totalStock")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
+                .content(objectMapper.writeValueAsString(data)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.message").value("查詢成功"))
@@ -202,9 +184,11 @@ public class ApiIntegrationTest {
         data.put("quantity", 100);
         data.put("note", "測試入庫");
         
-        ApiRequest request = new ApiRequest("inbound", data);
+        Map<String, Object> request = new HashMap<>();
+        request.put("action", "inbound");
+        request.put("data", data);
         
-        mockMvc.perform(post("/api/warehouse/operation")
+        mockMvc.perform(post("/api/warehouse/operation/operation")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
@@ -226,9 +210,11 @@ public class ApiIntegrationTest {
         data.put("quantity", 50);
         data.put("note", "測試出庫");
         
-        ApiRequest request = new ApiRequest("outbound", data);
+        Map<String, Object> request = new HashMap<>();
+        request.put("action", "outbound");
+        request.put("data", data);
         
-        mockMvc.perform(post("/api/warehouse/operation")
+        mockMvc.perform(post("/api/warehouse/operation/operation")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
@@ -251,11 +237,9 @@ public class ApiIntegrationTest {
         data.put("quantity", 30);
         data.put("note", "測試轉庫");
         
-        ApiRequest request = new ApiRequest("transfer", data);
-        
-        mockMvc.perform(post("/api/warehouse/operation")
+        mockMvc.perform(post("/api/warehouse/operation/transfer")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
+                .content(objectMapper.writeValueAsString(data)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.message").value("轉庫操作成功"))
@@ -273,9 +257,11 @@ public class ApiIntegrationTest {
         data.put("location", "A001");
         data.put("quantity", 50);
         
-        ApiRequest request = new ApiRequest("outbound", data);
+        Map<String, Object> request = new HashMap<>();
+        request.put("action", "outbound");
+        request.put("data", data);
         
-        mockMvc.perform(post("/api/warehouse/operation")
+        mockMvc.perform(post("/api/warehouse/operation/operation")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
@@ -288,11 +274,9 @@ public class ApiIntegrationTest {
     
     @Test
     void testMovementGetRecent() throws Exception {
-        ApiRequest request = new ApiRequest("getRecent", null);
-        
-        mockMvc.perform(post("/api/warehouse/movement")
+        mockMvc.perform(post("/api/warehouse/movement/recent")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
+                .content("{}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.message").value("查詢成功"))
@@ -309,11 +293,9 @@ public class ApiIntegrationTest {
         Map<String, Object> data = new HashMap<>();
         data.put("itemId", item.getId());
         
-        ApiRequest request = new ApiRequest("getByItem", data);
-        
-        mockMvc.perform(post("/api/warehouse/movement")
+        mockMvc.perform(post("/api/warehouse/movement/byItem")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
+                .content(objectMapper.writeValueAsString(data)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.message").value("查詢成功"))
@@ -326,11 +308,9 @@ public class ApiIntegrationTest {
         Map<String, Object> data = new HashMap<>();
         data.put("location", "A001");
         
-        ApiRequest request = new ApiRequest("getByLocation", data);
-        
-        mockMvc.perform(post("/api/warehouse/movement")
+        mockMvc.perform(post("/api/warehouse/movement/byLocation")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
+                .content(objectMapper.writeValueAsString(data)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.message").value("查詢成功"))
@@ -342,8 +322,8 @@ public class ApiIntegrationTest {
     
     @Test
     void testInvalidJsonFormat() throws Exception {
-        String invalidJson = "{\"action\": \"create\", \"data\": {\"name\": \"test\", \"unit\":}}";
-        mockMvc.perform(post("/api/warehouse/item")
+        String invalidJson = "{\"name\": \"test\", \"unit\":}";
+        mockMvc.perform(post("/api/warehouse/item/create")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(invalidJson))
                 .andExpect(status().isBadRequest())
@@ -353,10 +333,12 @@ public class ApiIntegrationTest {
     }
     
     @Test
-    void testMissingAction() throws Exception {
-        ApiRequest request = new ApiRequest(null, null);
+    void testMissingActionInOperation() throws Exception {
+        // Test missing action in operation endpoint
+        Map<String, Object> request = new HashMap<>();
+        request.put("data", new HashMap<>());
         
-        mockMvc.perform(post("/api/warehouse/item")
+        mockMvc.perform(post("/api/warehouse/operation/operation")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())

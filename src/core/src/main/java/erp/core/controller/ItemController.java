@@ -1,7 +1,6 @@
 package erp.core.controller;
 
 import erp.core.constant.ErrorCode;
-import erp.core.dto.ApiRequest;
 import erp.core.dto.ApiResponse;
 import erp.core.entity.Item;
 import erp.core.service.WarehouseManagementService;
@@ -25,32 +24,29 @@ public class ItemController {
     
     private final WarehouseManagementService warehouseService;
     
-    @PostMapping
-    public ApiResponse<?> handleItemOperation(@RequestBody ApiRequest request) {
+    /**
+     * 創建商品
+     */
+    @PostMapping("/create")
+    public ApiResponse<Item> createItem(@RequestBody Map<String, Object> data) {
         try {
-            String action = request.getAction();
-            Map<String, Object> data = request.getData();
-            
-            if (action == null) {
-                return ApiResponse.error("操作類型不能為空", ErrorCode.INVALID_ARGUMENT);
-            }
-            
-            switch (action) {
-                case "create":
-                    return handleCreate(data);
-                case "update":
-                    return handleUpdate(data);
-                case "delete":
-                    return handleDelete(data);
-                case "get":
-                    return handleGet(data);
-                case "getAll":
-                    return handleGetAll();
-                case "search":
-                    return handleSearch(data);
-                default:
-                    return ApiResponse.error("不支援的操作類型: " + action, ErrorCode.UNSUPPORTED_ACTION);
-            }
+            return handleCreate(data);
+        } catch (IllegalArgumentException e) {
+            log.warn("參數錯誤: {}", e.getMessage());
+            return ApiResponse.error(e.getMessage(), ErrorCode.INVALID_ARGUMENT);
+        } catch (Exception e) {
+            log.error("創建商品時發生未預期錯誤", e);
+            return ApiResponse.error("系統內部錯誤", ErrorCode.UNEXPECTED_ERROR);
+        }
+    }
+
+    /**
+     * 更新商品
+     */
+    @PostMapping("/update")
+    public ApiResponse<Item> updateItem(@RequestBody Map<String, Object> data) {
+        try {
+            return handleUpdate(data);
         } catch (IllegalArgumentException e) {
             log.warn("參數錯誤: {}", e.getMessage());
             return ApiResponse.error(e.getMessage(), ErrorCode.INVALID_ARGUMENT);
@@ -58,7 +54,77 @@ public class ItemController {
             log.warn("狀態錯誤: {}", e.getMessage());
             return ApiResponse.error(e.getMessage(), ErrorCode.INTERNAL_ERROR);
         } catch (Exception e) {
-            log.error("處理商品操作時發生未預期錯誤", e);
+            log.error("更新商品時發生未預期錯誤", e);
+            return ApiResponse.error("系統內部錯誤", ErrorCode.UNEXPECTED_ERROR);
+        }
+    }
+
+    /**
+     * 刪除商品
+     */
+    @PostMapping("/delete")
+    public ApiResponse<Void> deleteItem(@RequestBody Map<String, Object> data) {
+        try {
+            return handleDelete(data);
+        } catch (IllegalArgumentException e) {
+            log.warn("參數錯誤: {}", e.getMessage());
+            return ApiResponse.error(e.getMessage(), ErrorCode.INVALID_ARGUMENT);
+        } catch (IllegalStateException e) {
+            log.warn("狀態錯誤: {}", e.getMessage());
+            return ApiResponse.error(e.getMessage(), ErrorCode.INTERNAL_ERROR);
+        } catch (Exception e) {
+            log.error("刪除商品時發生未預期錯誤", e);
+            return ApiResponse.error("系統內部錯誤", ErrorCode.UNEXPECTED_ERROR);
+        }
+    }
+
+    /**
+     * 查詢商品資訊
+     * 支援三種查詢模式：
+     * 1. 查詢單一商品 (提供 id 參數)
+     * 2. 查詢所有商品 (不提供任何參數)
+     * 3. 按名稱模糊搜尋 (提供 name 參數)
+     */
+    @PostMapping("/info")
+    public ApiResponse<?> getItemInfo(@RequestBody(required = false) Map<String, Object> data) {
+        try {
+            Long id = null;
+            String name = null;
+            
+            // 從請求體中提取參數
+            if (data != null) {
+                Object idObj = data.get("id");
+                if (idObj != null) {
+                    id = Long.valueOf(idObj.toString());
+                }
+                name = (String) data.get("name");
+            }
+            
+            // 情況1: 查詢單一商品
+            if (id != null) {
+                Optional<Item> itemOpt = warehouseService.getItem(id);
+                if (itemOpt.isPresent()) {
+                    return ApiResponse.success("查詢成功", itemOpt.get());
+                } else {
+                    return ApiResponse.error("商品不存在", ErrorCode.ITEM_NOT_FOUND);
+                }
+            }
+            
+            // 情況3: 按名稱模糊搜尋
+            if (name != null && !name.trim().isEmpty()) {
+                List<Item> items = warehouseService.searchItemsByName(name.trim());
+                return ApiResponse.success("搜尋成功", items);
+            }
+            
+            // 情況2: 查詢所有商品
+            List<Item> items = warehouseService.getAllItems();
+            return ApiResponse.success("查詢成功", items);
+            
+        } catch (IllegalArgumentException e) {
+            log.warn("參數錯誤: {}", e.getMessage());
+            return ApiResponse.error(e.getMessage(), ErrorCode.INVALID_ARGUMENT);
+        } catch (Exception e) {
+            log.error("查詢商品資訊時發生未預期錯誤", e);
             return ApiResponse.error("系統內部錯誤", ErrorCode.UNEXPECTED_ERROR);
         }
     }
@@ -161,56 +227,4 @@ public class ItemController {
         }
     }
     
-    /**
-     * 查詢單一商品
-     */
-    private ApiResponse<Item> handleGet(Map<String, Object> data) {
-        if (data == null) {
-            return ApiResponse.error("請求資料不能為空", ErrorCode.INVALID_ARGUMENT);
-        }
-        
-        Object itemIdObj = data.get("itemId");
-        if (itemIdObj == null) {
-            return ApiResponse.error("商品ID不能為空", ErrorCode.INVALID_ARGUMENT);
-        }
-        
-        Long itemId;
-        try {
-            itemId = Long.valueOf(itemIdObj.toString());
-        } catch (NumberFormatException e) {
-            return ApiResponse.error("商品ID格式錯誤", ErrorCode.INVALID_ARGUMENT);
-        }
-        
-        Optional<Item> itemOpt = warehouseService.getItem(itemId);
-        if (itemOpt.isPresent()) {
-            return ApiResponse.success("查詢成功", itemOpt.get());
-        } else {
-            return ApiResponse.error("商品不存在", ErrorCode.ITEM_NOT_FOUND);
-        }
-    }
-    
-    /**
-     * 查詢所有商品
-     */
-    private ApiResponse<List<Item>> handleGetAll() {
-        List<Item> items = warehouseService.getAllItems();
-        return ApiResponse.success("查詢成功", items);
-    }
-    
-    /**
-     * 按名稱搜尋商品
-     */
-    private ApiResponse<List<Item>> handleSearch(Map<String, Object> data) {
-        if (data == null) {
-            return ApiResponse.error("請求資料不能為空", ErrorCode.INVALID_ARGUMENT);
-        }
-        
-        String name = (String) data.get("name");
-        if (name == null || name.trim().isEmpty()) {
-            return ApiResponse.error("搜尋名稱不能為空", ErrorCode.INVALID_ARGUMENT);
-        }
-        
-        List<Item> items = warehouseService.searchItemsByName(name.trim());
-        return ApiResponse.success("搜尋成功", items);
-    }
 }
